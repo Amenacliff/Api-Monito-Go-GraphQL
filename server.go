@@ -3,6 +3,7 @@ package main
 import (
 	"api-monito/graph"
 	"api-monito/graph/generated"
+	"api-monito/utils/dbUtil"
 	"log"
 	"net/http"
 	"os"
@@ -18,6 +19,8 @@ func main() {
 	if port == "" {
 		port = defaultPort
 	}
+
+	dbUtil.SetUpDB()
 
 	srv := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: &graph.Resolver{}}))
 
