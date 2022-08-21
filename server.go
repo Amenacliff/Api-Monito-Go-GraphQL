@@ -29,8 +29,8 @@ func main() {
 		log.Println(errStartDB.Error())
 		return 
 	}
-
 	
+
 
 	srv := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: &graph.Resolver{}}))
 
