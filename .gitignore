@@ -1,2 +1,10 @@
-.env
 .air.conf
+# Binaries for programs and plugins
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+.env
+bin
+/tmp
