@@ -4,6 +4,8 @@ import (
 	"api-monito/graph"
 	"api-monito/graph/generated"
 	"api-monito/models/User"
+	"api-monito/repository"
+	"api-monito/services/userService"
 	"api-monito/utils/dbUtil"
 	"log"
 	"net/http"
@@ -30,9 +32,12 @@ func main() {
 		return 
 	}
 	
+	userRepo := repository.NewUserRepository(db)
 
+	userService := userService.InitUserService(userRepo)
+	
 
-	srv := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: &graph.Resolver{}}))
+	srv := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: graph.NewResolver(userService)}))
 
 	http.Handle("/", playground.Handler("GraphQL playground", "/query"))
 	http.Handle("/query", srv)

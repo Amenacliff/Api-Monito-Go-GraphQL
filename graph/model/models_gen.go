@@ -2,19 +2,18 @@
 
 package model
 
-type NewTodo struct {
-	Text   string `json:"text"`
-	UserID string `json:"userId"`
-}
-
-type Todo struct {
-	ID   string `json:"id"`
-	Text string `json:"text"`
-	Done bool   `json:"done"`
-	User *User  `json:"user"`
+type CreateUser struct {
+	EmailAddress string `json:"emailAddress"`
+	Password     string `json:"password"`
 }
 
 type User struct {
-	ID   string `json:"id"`
-	Name string `json:"name"`
+	ID                   string    `json:"id"`
+	EmailAddress         string    `json:"emailAddress"`
+	HashedUserID         string    `json:"hashedUserId"`
+	PasswordHash         string    `json:"passwordHash"`
+	Projects             []string `json:"projects"`
+	APIKey               string    `json:"apiKey"`
+	TimeZone             string    `json:"timeZone"`
+	NotificationTurnedOn bool      `json:"notificationTurnedOn"`
 }

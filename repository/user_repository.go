@@ -3,6 +3,7 @@ package repository
 import (
 	"api-monito/models/User"
 	"api-monito/utils/stringUtility"
+	"context"
 	"log"
 	"strings"
 
@@ -12,7 +13,7 @@ import (
 
 type IUserRepository interface{
 	Create(emailAddress , password string) (bool, User.User, error)
-	GetOne(userId string)(User.User, error)
+	GetOne(userId string)(bool, User.User, error)
 	GetUserByEmail(emailAddress string)(bool, User.User, error )
 }
 
@@ -27,7 +28,7 @@ func NewUserRepository(db (*gorm.DB)) *UserRepository {
 	}
 }
 
-func (userRepo *UserRepository) Create(emailAddress, password string) (User.User, error ){
+func (userRepo *UserRepository) Create(emailAddress, password string) (bool, User.User, error ){
 	newUserId:= uuid.NewString()
 	newAPIKey :=  uuid.NewString()
 	newUser := User.User{
@@ -41,20 +42,24 @@ func (userRepo *UserRepository) Create(emailAddress, password string) (User.User
 		NotificationTurnedOn: false,
 	}
 
-	result := userRepo.userTable.Create(newUser)
+
+	result := userRepo.userTable.WithContext(context.Background()).Create(&newUser)
+
+		log.Println(result)
+
 
 	if result.Error != nil{
 		log.Println(result.Error.Error())
-		return User.User{}, result.Error
+		return false,  User.User{}, result.Error
 	}
 
-	return newUser, nil 
+	return result.RowsAffected > 0,  newUser, nil 
 }
 
 func(userRepo *UserRepository) GetOne(userId string)(bool,  User.User, error ){
 
 	var user User.User
-	result := userRepo.userTable.First(&user, "id = ?",  userId)
+	result := userRepo.userTable.WithContext(context.Background()).First(&user, "id = ?",  userId)
 
 	if result.Error != nil{
 		log.Println(result.Error.Error())
@@ -67,12 +72,14 @@ func(userRepo *UserRepository) GetOne(userId string)(bool,  User.User, error ){
 func(userRepo *UserRepository)GetUserByEmail(emailAddress string)(bool, User.User, error ){
 	var user User.User
 
-	result := userRepo.userTable.Where("emailAddress = ?", emailAddress).First(&user)
+	result := userRepo.userTable.WithContext(context.Background()).Where(User.User{EmailAddress: emailAddress}).First(&user)
 
 	if result.Error != nil{
-		log.Println(result.Error.Error())
+		if(result.Error.Error()  == "record not found"){
+			return false, user, nil 
+		}
 		return false, user, result.Error
-	}
-
+		}
+		
 	return result.RowsAffected > 0, user, nil 
 }

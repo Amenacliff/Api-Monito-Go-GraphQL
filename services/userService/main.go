@@ -11,7 +11,7 @@ import (
 
 
 type IUserService interface{
-
+	CreateAccount(emailAddress, password string)(User.User, error )
 }
 
 type UserService struct {
@@ -25,7 +25,7 @@ func InitUserService(userRepo repository.IUserRepository) *UserService{
 }
 
 func(userService UserService) CreateAccount(emailAddress, password string) (User.User, error ) {
-	doesUserExist, user, errorGetUser :=userService.userRepo.GetUserByEmail(emailAddress)
+	doesUserExist, user, errorGetUser := userService.userRepo.GetUserByEmail(emailAddress)
 
 	if errorGetUser != nil{
 		log.Println(errorGetUser.Error())
@@ -46,7 +46,11 @@ func(userService UserService) CreateAccount(emailAddress, password string) (User
 
 	passwordHash := string(bytes)
 
-	hasCreated, userObject, errCreateUser :=userService.userRepo.Create(emailAddress, passwordHash)
+	log.Println(passwordHash, emailAddress)
+
+	hasCreated, userObject, errCreateUser := userService.userRepo.Create(emailAddress, passwordHash)
+
+	
 
 	if errCreateUser != nil{
 		log.Println(errCreateUser.Error())
